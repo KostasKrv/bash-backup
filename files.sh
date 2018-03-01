@@ -1,26 +1,24 @@
 NOW=$(date +"%Y%m%d%H%M%S");
 
-# THE FOLDER WHERE THE BACKUPS WILL BE PLACED
+## THE FOLDER WHERE THE BACKUPS WILL BE PLACED ##
 BACKUP_BASEFOLDER='/var/www-backups'
 
-# THE LATEST BACKUP WILL BE PLACED IN HERE
+## THE LATEST BACKUP WILL BE PLACED IN HERE ##
 LATEST="$BACKUP_BASEFOLDER/latest_files"
 
-# THE FOLDER WE WANT TO BACKUP
+## THE FOLDER WE WANT TO BACKUP ##
 BACKUP_THIS_FOLDER='/var/www/';
 
-# Commit changes - Set to true in order to really execute the commands
+## Commit changes - Set to true in order to really execute the commands ##
 EXECUTE=false;
 
-# Maximum history states to be saved
+## Maximum history states to be saved ##
 HISTORY_STATES=9
 
 BACKUP_SAVE_FOLDER="$BACKUP_BASEFOLDER/$NOW"
 
-cd $BACKUP_THIS_FOLDER
-
-# Create the temporary folder
-if [ -d "$LATEST" ]; then
+## Create the temporary folder ##
+if [ ! -d "$BACKUP_SAVE_FOLDER" ]; then
     if [ $EXECUTE = true ]; then    
 		mkdir $BACKUP_SAVE_FOLDER
     else
@@ -28,14 +26,15 @@ if [ -d "$LATEST" ]; then
     fi    
 fi
 
-# Loop through the folders
+cd $BACKUP_THIS_FOLDER
+## Loop through the folders ##
 for onefolder in $(ls -d */);  do    	
     # Replace slash at the end of the filename
     foldername=$(echo $onefolder | sed -e 's/\///g')
     echo '-------------------------------------------------------------------'
     
-    # Exlude folders
-    if [ $foldername = 'krevatas' ] || [ $foldername = 'summerschool' ]; then
+    ## Exclude folders ##
+    if [ $foldername = 'SKIP_THIS_FOLDER' ] || [ $foldername = 'OR_SKIP_THIS_FOLDER' ]; then
     	echo '****** Skipping folder' $foldername '******'
         continue
     fi    
@@ -54,7 +53,7 @@ done
 
 echo '-------------------------------------------------------------------'
 
-# Rename previous latest to date
+## Rename previous latest to date ##
 if [ -d "$LATEST" ]; then
 	if [ $EXECUTE = true ]; then
 		mv $LATEST $BACKUP_BASEFOLDER/$(date -r "$LATEST" +"%Y%m%d%H%M%S")-files
@@ -63,18 +62,18 @@ if [ -d "$LATEST" ]; then
 	fi
 fi
 
-#	Rename current run to latest
+## Rename current run to latest ##
 if [ $EXECUTE = true ]; then
     mv $BACKUP_SAVE_FOLDER $LATEST
 else
     echo mv $BACKUP_SAVE_FOLDER $LATEST
 fi
 
-#	DELETE older files
+## DELETE older files ##
 cd $BACKUP_BASEFOLDER
 counter=0
 
-# List by Creation date
+## List by Creation date ##
 for onefolder in $(ls -td *-files/);  do 
     counter=$((counter+1))
     foldername=$(echo $onefolder | sed -e 's/\///g')
