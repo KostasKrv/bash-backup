@@ -22,7 +22,7 @@ cd $BACKUP_THIS_FOLDER
 # Create the temporary folder
 if [ -d "$LATEST" ]; then
     if [ $EXECUTE = true ]; then    
-		  mkdir $BACKUP_SAVE_FOLDER
+		mkdir $BACKUP_SAVE_FOLDER
     else
     	echo mkdir $BACKUP_SAVE_FOLDER
     fi    
@@ -56,9 +56,9 @@ echo '-------------------------------------------------------------------'
 
 # Rename previous latest to date
 if [ -d "$LATEST" ]; then
-  if [ $EXECUTE = true ]; then
-		  mv $LATEST $BACKUP_BASEFOLDER/$(date -r "$LATEST" +"%Y%m%d%H%M%S")-files
-  else
+	if [ $EXECUTE = true ]; then
+		mv $LATEST $BACKUP_BASEFOLDER/$(date -r "$LATEST" +"%Y%m%d%H%M%S")-files
+  	else
     	echo mv $LATEST $BACKUP_BASEFOLDER/$(date -r "$LATEST" +"%Y%m%d%H%M%S")-files
 	fi
 fi
@@ -80,7 +80,7 @@ for onefolder in $(ls -td *-files/);  do
     foldername=$(echo $onefolder | sed -e 's/\///g')
 	
     if [ $counter -gt $HISTORY_STATES ]; then
-      echo 'Removing old backup ' $BACKUP_BASEFOLDER/$foldername
+      	echo 'Removing old backup ' $BACKUP_BASEFOLDER/$foldername
     	if [ $EXECUTE = true ]; then
         	rm -r $BACKUP_BASEFOLDER/$foldername
     	else
