@@ -10,45 +10,46 @@ LATEST="$BACKUP_BASEFOLDER/latest_files"
 BACKUP_THIS_FOLDER='/var/www/';
 
 ## Commit changes - Set to true in order to really execute the commands ##
-EXECUTE=false;
+EXECUTE=true;
 
 ## Maximum history states to be saved ##
 HISTORY_STATES=9
 
+## Do not touch ##
 BACKUP_SAVE_FOLDER="$BACKUP_BASEFOLDER/$NOW"
 
 ## Create the temporary folder ##
 if [ ! -d "$BACKUP_SAVE_FOLDER" ]; then
-    if [ $EXECUTE = true ]; then    
+	if [ $EXECUTE = true ]; then    
 		mkdir $BACKUP_SAVE_FOLDER
-    else
-    	echo mkdir $BACKUP_SAVE_FOLDER
-    fi    
+	else
+		echo mkdir $BACKUP_SAVE_FOLDER
+	fi    
 fi
 
 cd $BACKUP_THIS_FOLDER
 ## Loop through the folders ##
 for onefolder in $(ls -d */);  do    	
-    # Replace slash at the end of the filename
-    foldername=$(echo $onefolder | sed -e 's/\///g')
-    echo '-------------------------------------------------------------------'
+	# Replace slash at the end of the filename
+	foldername=$(echo $onefolder | sed -e 's/\///g')
+	echo '-------------------------------------------------------------------'
     
-    ## Exclude folders ##
-    if [ $foldername = 'SKIP_THIS_FOLDER' ] || [ $foldername = 'OR_SKIP_THIS_FOLDER' ]; then
-    	echo '****** Skipping folder' $foldername '******'
-        continue
-    fi    
+	## Exclude folders ##
+	if [ $foldername = 'SKIP_THIS_FOLDER' ] || [ $foldername = 'OR_SKIP_THIS_FOLDER' ]; then
+		echo '****** Skipping folder' $foldername '******'
+		continue
+	fi    
     
-    echo 'Compressing :' $BACKUP_THIS_FOLDER$foldername
+	echo 'Compressing :' $BACKUP_THIS_FOLDER$foldername
     
-    GZ_FILE="$BACKUP_SAVE_FOLDER/$foldername.tar.gz"
-    if [ $EXECUTE = true ]; then    	
-       	tar -pczf $GZ_FILE $BACKUP_THIS_FOLDER$foldername
-    else 
-    	echo tar -pczf $GZ_FILE $BACKUP_THIS_FOLDER$foldername
-    fi
+	GZ_FILE="$BACKUP_SAVE_FOLDER/$foldername.tar.gz"
+	if [ $EXECUTE = true ]; then    	
+		tar -pczf $GZ_FILE $BACKUP_THIS_FOLDER$foldername
+	else 
+		echo tar -pczf $GZ_FILE $BACKUP_THIS_FOLDER$foldername
+	fi
         
-  	echo 'Finished compression =>' $GZ_FILE
+	echo 'Finished compression =>' $GZ_FILE
 done
 
 echo '-------------------------------------------------------------------'
@@ -58,15 +59,15 @@ if [ -d "$LATEST" ]; then
 	if [ $EXECUTE = true ]; then
 		mv $LATEST $BACKUP_BASEFOLDER/$(date -r "$LATEST" +"%Y%m%d%H%M%S")-files
   	else
-    	echo mv $LATEST $BACKUP_BASEFOLDER/$(date -r "$LATEST" +"%Y%m%d%H%M%S")-files
+		echo mv $LATEST $BACKUP_BASEFOLDER/$(date -r "$LATEST" +"%Y%m%d%H%M%S")-files
 	fi
 fi
 
 ## Rename current run to latest ##
 if [ $EXECUTE = true ]; then
-    mv $BACKUP_SAVE_FOLDER $LATEST
+	mv $BACKUP_SAVE_FOLDER $LATEST
 else
-    echo mv $BACKUP_SAVE_FOLDER $LATEST
+	echo mv $BACKUP_SAVE_FOLDER $LATEST
 fi
 
 ## DELETE older files ##
@@ -75,15 +76,17 @@ counter=0
 
 ## List by Creation date ##
 for onefolder in $(ls -td *-files/);  do 
-    counter=$((counter+1))
-    foldername=$(echo $onefolder | sed -e 's/\///g')
+	counter=$((counter+1))
+	foldername=$(echo $onefolder | sed -e 's/\///g')
 	
-    if [ $counter -gt $HISTORY_STATES ]; then
-      	echo 'Removing old backup ' $BACKUP_BASEFOLDER/$foldername
-    	if [ $EXECUTE = true ]; then
-        	rm -r $BACKUP_BASEFOLDER/$foldername
-    	else
-        	echo rm -r $BACKUP_BASEFOLDER/$foldername
-    	fi
-    fi
+	if [ $counter -gt $HISTORY_STATES ]; then
+		echo 'Removing old backup ' $BACKUP_BASEFOLDER/$foldername
+		if [ $EXECUTE = true ]; then
+			rm -r $BACKUP_BASEFOLDER/$foldername
+		else
+			echo rm -r $BACKUP_BASEFOLDER/$foldername
+		fi
+	fi
 done
+
+echo 'Finished all processes'
